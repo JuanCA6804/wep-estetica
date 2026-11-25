@@ -1,0 +1,60 @@
+<div class="historial-container">
+  <h2>Historial y Búsqueda de Clientes</h2>
+
+  <div class="search-box">
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+      <div class="search-row">
+        <div class="input-col">
+          <label for="termino">Buscar por Nombre, Teléfono o Servicio</label>
+          <input
+            type="text"
+            id="termino"
+            formControlName="termino"
+            placeholder="Ej. María, 271 o Manicure..."
+            [class.is-invalid]="searchForm.get('termino')?.invalid && searchForm.get('termino')?.touched"
+          >
+        </div>
+        <button type="submit" class="btn-primary">Buscar</button>
+      </div>
+      @if (searchForm.get('termino')?.invalid && searchForm.get('termino')?.touched) {
+        <span class="error-message">Debe ingresar un término de búsqueda.</span>
+      }
+    </form>
+  </div>
+
+  <div class="results-area">
+    @if (hasSearched()) {
+      <p>Resultados para: <strong>{{ lastTerm() }}</strong></p>
+      @if (resultados().length > 0) {
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Servicio</th>
+                <th>Estado</th>
+                <th>Bitácora</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (res of resultados(); track res.id_cita) {
+                <tr>
+                  <td>{{ res.fecha | date:'dd/MM/yyyy' }} ({{ res.hora }})</td>
+                  <td>{{ res.nombre_invitado }}</td>
+                  <td>{{ res.servicio || 'General' }}</td>
+                  <td>{{ res.estado }}</td>
+                  <td>{{ res.modificadoPor }} &middot; {{ res.fechaModificacion }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <p>No se encontraron registros con ese criterio.</p>
+        </div>
+      }
+    }
+  </div>
+</div>

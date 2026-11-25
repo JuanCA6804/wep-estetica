@@ -1,0 +1,75 @@
+<section class="split-section">
+  <div class="split-image">
+    <img
+      src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=800"
+      alt="Estética Unisex Kenya"
+      loading="lazy"
+    >
+  </div>
+  <div class="split-text text-center">
+    <h2>Nos mueven los nuevos <br>comienzos</h2>
+    <p class="subtitle">
+      Creemos que el verdadero cambio viene desde el interior, por eso, ponemos a tu servicio todo nuestro profesionalismo y conocimiento, basados en evidencia.
+    </p>
+    <p class="highlight">
+      Logramos que luzcas saludable, fresca, joven y te guiamos para adoptar hábitos de autocuidado y bienestar integral.
+    </p>
+    <div class="founder-section">
+      <h3>Conoce a Mónica</h3>
+      <p>
+        Mónica, fundadora de Estética Unisex Kenya, es una profesional apasionada por la belleza y el cuidado personal. Con años de experiencia en el sector, su objetivo principal ha sido siempre crear un espacio donde cada cliente se sienta especial, escuchado y renovado. Su dedicación a la excelencia y atención al detalle son el corazón de nuestra estética.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Métricas de confianza -->
+<section class="metricas-section">
+  <div class="metricas-grid">
+    <div class="metrica-card">
+      <strong>+1,200</strong>
+      <span>Clientes atendidos con éxito</span>
+    </div>
+    <div class="metrica-card">
+      <strong>8+ años</strong>
+      <span>De experiencia en estética y spa</span>
+    </div>
+    <div class="metrica-card">
+      <strong>4.9 / 5 ★</strong>
+      <span>Calificación promedio de satisfacción</span>
+    </div>
+  </div>
+</section>
+
+<!-- Carrusel de Testimonios en movimiento continuo sin pausas -->
+<section class="testimonios-section" aria-label="Testimonios de clientes">
+  <div class="testimonios-container">
+    <div class="testimonios-header">
+      <span class="eyebrow">EXPERIENCIAS REALES</span>
+      <h2>Lo que dicen nuestros clientes</h2>
+      <p>Historias de quienes ya confiaron su cuidado e imagen en Estética Kenya.</p>
+    </div>
+  </div>
+
+  <div class="marquee-viewport">
+    <div class="marquee-track">
+      @for (item of slidesContinuos; track $index) {
+        <div class="marquee-slide">
+          <article class="testimonio-card">
+            <div class="stars" [attr.aria-label]="item.calificacion + ' de 5 estrellas'">
+              {{ estrellas(item.calificacion) }}
+            </div>
+            <p class="quote">"{{ item.comentario }}"</p>
+            <div class="author-row">
+              <div class="avatar">{{ item.iniciales }}</div>
+              <div>
+                <h4>{{ item.nombre }}</h4>
+                <span>{{ item.servicio }} &middot; {{ item.fecha }}</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      }
+    </div>
+  </div>
+</section>

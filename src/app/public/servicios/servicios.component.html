@@ -1,0 +1,72 @@
+<!-- 1. Hero Section -->
+<section class="hero-servicios">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1>¡Los mejores<br>cambios de look!</h1>
+    <p>Reserva tu cita y descubre nuestros servicios y paquetes especiales</p>
+    <div class="hero-buttons">
+      <button class="btn-outline-light" (click)="goToProductos()">Productos</button>
+      <button class="btn-dark" (click)="agendarCita()">Agendar Cita</button>
+    </div>
+  </div>
+</section>
+
+<section class="servicios-tabs-section" id="servicios">
+  <div class="container">
+    <h2 class="section-title">Servicios y Paquetes</h2>
+
+    <div class="tabs-header">
+      @for (tab of pestanasCategorias(); track tab) {
+        <button
+          class="tab-btn"
+          [class.active]="activeTab() === tab"
+          (click)="seleccionarTab(tab)"
+        >
+          {{ tab }}
+        </button>
+      }
+    </div>
+
+    <div class="services-grid">
+      @for (servicio of itemsVisibles(); track servicio.id) {
+        <div class="service-card">
+          <div class="service-img">
+            <img [src]="servicio.image" [alt]="servicio.title" loading="lazy">
+            <span class="service-badge" [class.paquete]="servicio.tipo === 'paquete'">
+              {{ servicio.tipo === 'paquete' ? 'Paquete' : 'Servicio' }}
+            </span>
+          </div>
+          <div class="service-info">
+            <div class="service-meta">
+              <span class="cat-label">{{ servicio.category }}</span>
+              @if (servicio.duracion) {
+                <span class="dur-label">⏱ {{ servicio.duracion }}</span>
+              }
+            </div>
+            <h4>{{ servicio.title }}</h4>
+            <p class="service-desc">{{ servicio.description }}</p>
+            <p class="price">{{ servicio.price | currency:'MXN':'symbol-narrow':'1.2-2' }} MXN</p>
+            <button class="btn-agendar-outline" (click)="agendarCita(servicio)">
+              {{ servicio.tipo === 'paquete' ? 'Reservar paquete' : 'Agendar cita' }}
+            </button>
+          </div>
+        </div>
+      } @empty {
+        <p>No hay servicios ni paquetes registrados en esta categoría.</p>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- 4. Cita de valoración -->
+<section class="cita-valoracion">
+  <div class="cita-overlay"></div>
+  <div class="cita-content">
+    <h2>Cita de valoración</h2>
+    <p>Agenda con nosotros tu cita de valoración para entender cuáles son tus necesidades. De la mano de expertos.</p>
+    <div class="cita-actions">
+      <button class="btn-dark" (click)="agendarCita()">Agendar cita</button>
+      <a class="btn-outline" href="tel:+522732338964">Llamar ahora</a>
+    </div>
+  </div>
+</section>

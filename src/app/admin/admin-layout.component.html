@@ -1,0 +1,80 @@
+<div class="admin-container" [class.mobile-admin]="responsive.isHandset()">
+  @if (responsive.isHandset() && sidebarOpen()) {
+    <div class="sidebar-backdrop" (click)="closeSidebar()"></div>
+  }
+
+  <aside class="sidebar" [class.open]="!responsive.isHandset() || sidebarOpen()">
+    <div class="sidebar-header">
+      <h2>Kenya Admin</h2>
+      @if (responsive.isHandset()) {
+        <button type="button" class="close-drawer" aria-label="Cerrar menú" (click)="closeSidebar()">✕</button>
+      }
+    </div>
+
+    <ul class="sidebar-menu">
+      <li>
+        <a routerLink="dashboard" routerLinkActive="active" (click)="closeSidebar()">
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <a routerLink="productos" routerLinkActive="active" (click)="closeSidebar()">
+          Productos, Servicios y Paquetes
+        </a>
+      </li>
+      <li>
+        <a routerLink="citas" routerLinkActive="active" (click)="closeSidebar()">
+          Citas
+        </a>
+      </li>
+      <li>
+        <a routerLink="usuarios" routerLinkActive="active" (click)="closeSidebar()">
+          Usuarios y Roles
+        </a>
+      </li>
+      <li>
+        <a routerLink="historial" routerLinkActive="active" (click)="closeSidebar()">
+          Historial
+        </a>
+      </li>
+      <li>
+        <a routerLink="/inicio" (click)="closeSidebar()">
+          Ver Landing Pública
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <button type="button" class="btn-logout" (click)="logout()">Cerrar Sesión</button>
+    </div>
+  </aside>
+
+  <main class="content-area">
+    <header class="topbar">
+      <div class="topbar-left">
+        @if (responsive.isHandset()) {
+          <button
+            type="button"
+            class="menu-toggle"
+            aria-label="Abrir menú lateral"
+            (click)="toggleSidebar()"
+          >
+            ☰
+          </button>
+        }
+        <h3>Panel Administrativo</h3>
+      </div>
+
+      @if (authService.user(); as user) {
+        <div class="topbar-user">
+          <span class="user-name">{{ user.nombre_usuario }}</span>
+          <span class="role-pill">{{ user.rol }}</span>
+        </div>
+      }
+    </header>
+
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,168 @@
+<div class="header-action">
+  <div>
+    <h2>Gestión de Usuarios y Roles</h2>
+    <p style="font-size: 0.86rem; color: var(--text-muted);">
+      Control de roles, correo único y bitácora por registro
+    </p>
+  </div>
+
+  <div class="search-actions">
+    <div class="search-box">
+      <input
+        type="search"
+        placeholder="Buscar por nombre o correo..."
+        [ngModel]="terminoBusqueda()"
+        (ngModelChange)="onBuscar($event)"
+      >
+    </div>
+    <select
+      class="filter-select"
+      [ngModel]="rolFiltro()"
+      (ngModelChange)="onFiltroRol($event)"
+    >
+      <option value="todos">Todos los roles</option>
+      @for (r of rolesDisponibles; track r) {
+        <option [value]="r">{{ r }}</option>
+      }
+    </select>
+    <button type="button" class="btn-primary" (click)="abrirNuevo()">+ Nuevo Usuario</button>
+  </div>
+</div>
+
+@if (feedback(); as fb) {
+  <div class="feedback-banner" [class.success]="fb.tipo === 'success'" [class.error]="fb.tipo === 'error'" role="status">
+    <span>{{ fb.texto }}</span>
+  </div>
+}
+
+@if (formAbierto()) {
+  <div class="form-panel">
+    <h3>{{ editandoId() === null ? 'Registrar Nuevo Usuario' : 'Editar Usuario #' + editandoId() }}</h3>
+
+    <form [formGroup]="usuarioForm" (ngSubmit)="guardar()">
+      <div class="crud-form-grid">
+        <div>
+          <label for="u_nombre">Nombre de Usuario *</label>
+          <input
+            id="u_nombre"
+            type="text"
+            formControlName="nombre_usuario"
+            placeholder="Ej. maria_recepcion"
+            [class.is-invalid]="usuarioForm.controls.nombre_usuario.invalid && usuarioForm.controls.nombre_usuario.touched"
+          >
+          @if (usuarioForm.controls.nombre_usuario.invalid && usuarioForm.controls.nombre_usuario.touched) {
+            <span class="error-message">Mínimo 3 caracteres requeridos.</span>
+          }
+        </div>
+
+        <div>
+          <label for="u_correo">Correo Electrónico (único) *</label>
+          <input
+            id="u_correo"
+            type="email"
+            formControlName="correo"
+            placeholder="usuario&#64;kenya.com"
+            [class.is-invalid]="usuarioForm.controls.correo.invalid && usuarioForm.controls.correo.touched"
+          >
+          @if (usuarioForm.controls.correo.invalid && usuarioForm.controls.correo.touched) {
+            <span class="error-message">Ingresa un correo válido.</span>
+          }
+        </div>
+
+        <div>
+          <label for="u_rol">Rol *</label>
+          <select id="u_rol" formControlName="rol">
+            @for (r of rolesDisponibles; track r) {
+              <option [value]="r">{{ r }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label for="u_pass">
+            {{ editandoId() === null ? 'Contraseña (mín. 6) *' : 'Nueva Contraseña (opcional)' }}
+          </label>
+          <input
+            id="u_pass"
+            type="password"
+            formControlName="password"
+            placeholder="Se guarda con hash SHA-256"
+            [class.is-invalid]="usuarioForm.controls.password.invalid && usuarioForm.controls.password.touched"
+          >
+          @if (usuarioForm.controls.password.invalid && usuarioForm.controls.password.touched) {
+            <span class="error-message">La contraseña debe tener al menos 6 caracteres.</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando...' : editandoId() === null ? 'Crear Usuario' : 'Guardar Cambios' }}
+        </button>
+        <button type="button" class="btn-outline-secondary" (click)="cancelarForm()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+}
+
+<div class="table-container">
+  <div class="table-scroll">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre de Usuario</th>
+          <th>Correo</th>
+          <th>Rol</th>
+          <th>Última modificación</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of paginados(); track user.id_usuario) {
+          <tr>
+            <td>#{{ user.id_usuario }}</td>
+            <td>{{ user.nombre_usuario }}</td>
+            <td>{{ user.correo || 'N/A' }}</td>
+            <td><span class="badge">{{ user.rol }}</span></td>
+            <td class="audit-cell">
+              <strong>{{ user.modificadoPor }}</strong>
+              <span>{{ user.fechaModificacion }}</span>
+            </td>
+            <td class="actions-cell">
+              <button type="button" class="btn-action edit" (click)="abrirEditar(user)">Editar</button>
+              <button
+                type="button"
+                class="btn-action delete"
+                [disabled]="esUsuarioActual(user)"
+                [title]="esUsuarioActual(user) ? 'No puedes eliminar la sesión activa' : 'Eliminar usuario'"
+                (click)="solicitarEliminar(user)"
+              >
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="empty-cell">No se encontraron usuarios con ese filtro.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-paginacion
+    [totalItems]="filtrados().length"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage()"
+    (pageChange)="currentPage.set($event)"
+  />
+</div>
+
+<app-confirm-modal
+  [open]="usuarioAEliminar() !== null"
+  title="Eliminar Usuario"
+  [message]="'¿Estás seguro de eliminar al usuario &quot;' + (usuarioAEliminar()?.nombre_usuario || '') + '&quot;?'"
+  (cancel)="usuarioAEliminar.set(null)"
+  (confirm)="confirmarEliminar()"
+/>

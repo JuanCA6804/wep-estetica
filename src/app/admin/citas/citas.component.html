@@ -1,0 +1,182 @@
+<div class="header-action">
+  <div>
+    <h2>Citas Programadas</h2>
+    <p style="font-size: 0.86rem; color: var(--text-muted);">
+      CRUD completo con paginación y bitácora por registro
+    </p>
+  </div>
+
+  <div class="search-actions">
+    <div class="search-box">
+      <input
+        type="search"
+        placeholder="Buscar cliente o servicio..."
+        [ngModel]="terminoBusqueda()"
+        (ngModelChange)="onBuscar($event)"
+      >
+    </div>
+    <select
+      class="filter-select"
+      [ngModel]="estadoFiltro()"
+      (ngModelChange)="onFiltroEstado($event)"
+    >
+      <option value="todos">Todos los estados</option>
+      @for (est of estados; track est) {
+        <option [value]="est">{{ est }}</option>
+      }
+    </select>
+    <button type="button" class="btn-primary" (click)="abrirNueva()">+ Agendar Cita</button>
+  </div>
+</div>
+
+@if (feedback(); as fb) {
+  <div class="feedback-banner" [class.success]="fb.tipo === 'success'" [class.error]="fb.tipo === 'error'" role="status">
+    <span>{{ fb.texto }}</span>
+  </div>
+}
+
+@if (detalleCita(); as det) {
+  <div class="detail-panel">
+    <div class="detail-header">
+      <h4>Detalle de la Cita #{{ det.id_cita }}</h4>
+      <button type="button" class="btn-outline-secondary" (click)="detalleCita.set(null)">Cerrar</button>
+    </div>
+    <p><strong>Cliente:</strong> {{ det.nombre_invitado }}</p>
+    <p><strong>Teléfono:</strong> {{ det.telefono || 'No registrado' }}</p>
+    <p><strong>Servicio:</strong> {{ det.servicio || 'Servicio general' }}</p>
+    <p><strong>Fecha y Hora:</strong> {{ det.fecha | date:'dd/MM/yyyy' }} a las {{ det.hora }}</p>
+    <p><strong>Estado:</strong> {{ det.estado }}</p>
+    <p><strong>Bitácora:</strong> Última modificación por {{ det.modificadoPor }} el {{ det.fechaModificacion }}</p>
+  </div>
+}
+
+@if (formAbierto()) {
+  <div class="form-panel">
+    <h3>{{ editandoId() === null ? 'Nueva Cita' : 'Editar Cita #' + editandoId() }}</h3>
+
+    <form [formGroup]="citaForm" (ngSubmit)="guardar()">
+      <div class="crud-form-grid">
+        <div>
+          <label for="c_cliente">Nombre del Cliente *</label>
+          <input
+            id="c_cliente"
+            type="text"
+            formControlName="nombre_invitado"
+            placeholder="Ej. María López"
+            [class.is-invalid]="citaForm.controls.nombre_invitado.invalid && citaForm.controls.nombre_invitado.touched"
+          >
+          @if (citaForm.controls.nombre_invitado.invalid && citaForm.controls.nombre_invitado.touched) {
+            <span class="error-message">El nombre del cliente es obligatorio (mín. 3 caracteres).</span>
+          }
+        </div>
+
+        <div>
+          <label for="c_tel">Teléfono (10 dígitos) *</label>
+          <input
+            id="c_tel"
+            type="tel"
+            maxlength="10"
+            formControlName="telefono"
+            placeholder="2711234567"
+            [class.is-invalid]="citaForm.controls.telefono.invalid && citaForm.controls.telefono.touched"
+          >
+          @if (citaForm.controls.telefono.invalid && citaForm.controls.telefono.touched) {
+            <span class="error-message">Debe contener 10 dígitos numéricos.</span>
+          }
+        </div>
+
+        <div>
+          <label for="c_servicio">Servicio o Paquete *</label>
+          <select id="c_servicio" formControlName="servicio">
+            @for (srv of servicios(); track srv) {
+              <option [value]="srv">{{ srv }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label for="c_fecha">Fecha *</label>
+          <input
+            id="c_fecha"
+            type="date"
+            formControlName="fecha"
+            [class.is-invalid]="citaForm.controls.fecha.invalid && citaForm.controls.fecha.touched"
+          >
+          @if (citaForm.controls.fecha.invalid && citaForm.controls.fecha.touched) {
+            <span class="error-message">La fecha es obligatoria.</span>
+          }
+        </div>
+
+        <div>
+          <label for="c_hora">Hora *</label>
+          <input
+            id="c_hora"
+            type="time"
+            formControlName="hora"
+            [class.is-invalid]="citaForm.controls.hora.invalid && citaForm.controls.hora.touched"
+          >
+          @if (citaForm.controls.hora.invalid && citaForm.controls.hora.touched) {
+            <span class="error-message">La hora es obligatoria.</span>
+          }
+        </div>
+
+        <div>
+          <label for="c_estado">Estado *</label>
+          <select id="c_estado" formControlName="estado">
+            @for (est of estados; track est) {
+              <option [value]="est">{{ est }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">
+          {{ editandoId() === null ? 'Guardar Cita' : 'Actualizar Cita' }}
+        </button>
+        <button type="button" class="btn-outline-secondary" (click)="cancelarForm()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+}
+
+<div class="citas-list">
+  @for (cita of paginadas(); track cita.id_cita) {
+    <div class="cita-card">
+      <div class="cita-time">
+        <strong>{{ cita.fecha | date:'dd/MM/yyyy' }}</strong>
+        <span>{{ cita.hora }}</span>
+      </div>
+      <div class="cita-info">
+        <h4>#{{ cita.id_cita }} &mdash; {{ cita.nombre_invitado || 'Cliente #' + cita.id_cliente }}</h4>
+        <p class="cita-meta">
+          {{ cita.servicio || 'Servicio general' }} &middot; Modificado por
+          <strong>{{ cita.modificadoPor }}</strong> ({{ cita.fechaModificacion }})
+        </p>
+        <span class="status-badge" [class]="cita.estado.toLowerCase()">{{ cita.estado }}</span>
+      </div>
+      <div class="cita-actions">
+        <button type="button" class="btn-action view" (click)="verDetalles(cita)">Ver</button>
+        <button type="button" class="btn-action edit" (click)="abrirEditar(cita)">Editar</button>
+        <button type="button" class="btn-action delete" (click)="solicitarEliminar(cita)">Eliminar</button>
+      </div>
+    </div>
+  } @empty {
+    <div class="table-container empty-cell">No hay citas que coincidan con tu búsqueda.</div>
+  }
+</div>
+
+<app-paginacion
+  [totalItems]="filtradas().length"
+  [pageSize]="pageSize"
+  [currentPage]="currentPage()"
+  (pageChange)="currentPage.set($event)"
+/>
+
+<app-confirm-modal
+  [open]="citaAEliminar() !== null"
+  title="Eliminar Cita"
+  [message]="'¿Confirmas eliminar la cita #' + (citaAEliminar()?.id_cita || '') + ' de ' + (citaAEliminar()?.nombre_invitado || '') + '?'"
+  (cancel)="citaAEliminar.set(null)"
+  (confirm)="confirmarEliminar()"
+/>

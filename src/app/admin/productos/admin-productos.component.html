@@ -1,0 +1,237 @@
+<div class="header-action">
+  <div>
+    <h2>Gestión de Productos, Servicios y Paquetes</h2>
+  </div>
+
+  <div class="search-actions">
+    <div class="search-box">
+      <input
+        type="search"
+        placeholder="Buscar por nombre, categoría o ID..."
+        [ngModel]="terminoBusqueda()"
+        (ngModelChange)="onBuscar($event)"
+      >
+    </div>
+    <select
+      class="filter-select"
+      [ngModel]="tipoFiltro()"
+      (ngModelChange)="onFiltroTipo($event)"
+    >
+      <option value="todos">Todos los tipos</option>
+      <option value="producto">Solo Productos</option>
+      <option value="servicio">Solo Servicios</option>
+      <option value="paquete">Solo Paquetes</option>
+    </select>
+    <select
+      class="filter-select"
+      [ngModel]="categoriaFiltro()"
+      (ngModelChange)="onFiltroCategoria($event)"
+    >
+      <option value="todas">Todas las categorías</option>
+      @for (cat of productosService.categorias(); track cat) {
+        <option [value]="cat">{{ cat }}</option>
+      }
+    </select>
+    <button type="button" class="btn-primary" (click)="abrirNuevo('producto')">+ Nuevo Producto</button>
+    <button type="button" class="btn-primary" (click)="abrirNuevo('servicio')">+ Nuevo Servicio / Paquete</button>
+  </div>
+</div>
+
+@if (feedback(); as fb) {
+  <div class="feedback-banner" [class.success]="fb.tipo === 'success'" [class.error]="fb.tipo === 'error'" role="status">
+    <span>{{ fb.texto }}</span>
+  </div>
+}
+
+@if (formAbierto()) {
+  <div class="form-panel">
+    <h3>
+      {{
+        editandoId() === null
+          ? 'Nuevo Registro'
+          : 'Editar Registro #' + editandoId()
+      }}
+    </h3>
+
+    <form [formGroup]="productoForm" (ngSubmit)="guardar()">
+      <div class="crud-form-grid">
+        <div>
+          <label for="prod_tipo">Tipo de registro *</label>
+          <select
+            id="prod_tipo"
+            formControlName="tipo"
+            (change)="alCambiarTipoForm()"
+          >
+            <option value="producto">Producto</option>
+            <option value="servicio">Servicio</option>
+            <option value="paquete">Paquete</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="prod_title">Nombre *</label>
+          <input
+            id="prod_title"
+            type="text"
+            formControlName="title"
+            placeholder="Ej. Corte en capas, Paquete Novia o Shampoo..."
+            [class.is-invalid]="productoForm.controls.title.invalid && productoForm.controls.title.touched"
+          >
+          @if (productoForm.controls.title.invalid && productoForm.controls.title.touched) {
+            <span class="error-message">Nombre obligatorio (mínimo 3 caracteres).</span>
+          }
+        </div>
+
+        <div>
+          <label for="prod_price">Precio ($ MXN) *</label>
+          <input
+            id="prod_price"
+            type="number"
+            step="1"
+            min="1"
+            formControlName="price"
+            [class.is-invalid]="productoForm.controls.price.invalid && productoForm.controls.price.touched"
+          >
+          @if (productoForm.controls.price.invalid && productoForm.controls.price.touched) {
+            <span class="error-message">El precio debe ser mayor a $0 MXN.</span>
+          }
+        </div>
+
+        <div>
+          <label for="prod_category">Categoría *</label>
+          <select
+            id="prod_category"
+            formControlName="category"
+            [class.is-invalid]="productoForm.controls.category.invalid && productoForm.controls.category.touched"
+          >
+            <option value="">Selecciona una categoría</option>
+            @for (cat of productosService.categorias(); track cat) {
+              <option [value]="cat">{{ cat }}</option>
+            }
+          </select>
+          @if (productoForm.controls.category.invalid && productoForm.controls.category.touched) {
+            <span class="error-message">Selecciona una categoría.</span>
+          }
+        </div>
+
+        <div>
+          <label for="prod_duracion">Duración o presentación *</label>
+          <input
+            id="prod_duracion"
+            type="text"
+            formControlName="duracion"
+            placeholder="Ej. 45 min, 3 hrs o Envase 500 ml"
+            [class.is-invalid]="productoForm.controls.duracion.invalid && productoForm.controls.duracion.touched"
+          >
+          @if (productoForm.controls.duracion.invalid && productoForm.controls.duracion.touched) {
+            <span class="error-message">Indica la duración o presentación.</span>
+          }
+        </div>
+
+        <div>
+          <label for="prod_image">URL de Imagen *</label>
+          <input
+            id="prod_image"
+            type="text"
+            formControlName="image"
+            placeholder="https://... o assets/images/producto_1.jpg"
+            [class.is-invalid]="productoForm.controls.image.invalid && productoForm.controls.image.touched"
+          >
+          @if (productoForm.controls.image.invalid && productoForm.controls.image.touched) {
+            <span class="error-message">Ingresa la URL de la imagen.</span>
+          }
+        </div>
+
+        <div class="full-width">
+          <label for="prod_desc">Descripción *</label>
+          <textarea
+            id="prod_desc"
+            rows="3"
+            formControlName="description"
+            placeholder="Describe el producto, servicio o paquete (mín. 10 caracteres)"
+            [class.is-invalid]="productoForm.controls.description.invalid && productoForm.controls.description.touched"
+          ></textarea>
+          @if (productoForm.controls.description.invalid && productoForm.controls.description.touched) {
+            <span class="error-message">La descripción es obligatoria (mínimo 10 caracteres).</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando...' : editandoId() === null ? 'Guardar' : 'Actualizar Cambios' }}
+        </button>
+        <button type="button" class="btn-outline-secondary" [disabled]="guardando()" (click)="cancelarForm()">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+}
+
+<div class="table-container">
+  <div class="table-scroll">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Imagen</th>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Categoría</th>
+          <th>Duración / Presentación</th>
+          <th>Precio (MXN)</th>
+          <th>Última modificación</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (prod of paginados(); track prod.id) {
+          <tr>
+            <td>#{{ prod.id }}</td>
+            <td>
+              <img [src]="prod.image" [alt]="prod.title" class="thumb-img" loading="lazy">
+            </td>
+            <td>
+              <strong>{{ prod.title }}</strong>
+            </td>
+            <td>
+              <span class="tipo-pill" [class]="prod.tipo">{{ etiquetaTipo(prod.tipo) }}</span>
+            </td>
+            <td><span class="badge">{{ prod.category }}</span></td>
+            <td>{{ prod.duracion }}</td>
+            <td><strong>{{ prod.price | currency:'MXN':'symbol-narrow':'1.2-2' }} MXN</strong></td>
+            <td class="audit-cell">
+              <strong>{{ prod.modificadoPor || 'johnd' }}</strong>
+              <span>{{ prod.fechaModificacion || 'N/A' }}</span>
+            </td>
+            <td class="actions-cell">
+              <button type="button" class="btn-action edit" (click)="abrirEditar(prod)">Editar</button>
+              <button type="button" class="btn-action delete" (click)="solicitarEliminar(prod)">Eliminar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="9" class="empty-cell">No hay productos, servicios ni paquetes que coincidan con el filtro.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-paginacion
+    [totalItems]="filtrados().length"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage()"
+    (pageChange)="currentPage.set($event)"
+  />
+</div>
+
+<app-confirm-modal
+  [open]="productoAEliminar() !== null"
+  title="Eliminar del Catálogo"
+  [message]="'¿Confirmas eliminar &quot;' + (productoAEliminar()?.title || '') + '&quot; del catálogo?'"
+  [busy]="eliminando()"
+  (cancel)="productoAEliminar.set(null)"
+  (confirm)="confirmarEliminar()"
+/>

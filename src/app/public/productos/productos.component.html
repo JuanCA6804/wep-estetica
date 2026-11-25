@@ -1,0 +1,80 @@
+<!-- 1. Hero Section -->
+<section class="hero-productos">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1>Nuestros Productos</h1>
+    <p>Cuidado capilar, facial y spa profesional para prolongar tu belleza en casa.</p>
+  </div>
+</section>
+
+<!-- 2. Productos Grid -->
+<section class="productos-section" id="productos">
+  <div class="container">
+    <div class="productos-header">
+      <h2 class="section-title">Catálogo de Productos</h2>
+
+      <div class="filtros-bar">
+        <input
+          type="search"
+          class="search-input"
+          placeholder="Buscar producto por nombre, presentación o descripción..."
+          [ngModel]="busqueda()"
+          (ngModelChange)="busqueda.set($event)"
+        >
+        <div class="category-pills">
+          <button
+            type="button"
+            class="pill-btn"
+            [class.active]="categoriaActiva() === 'todas'"
+            (click)="seleccionarCategoria('todas')"
+          >
+            Todas
+          </button>
+          @for (cat of productosService.categoriasProductos(); track cat) {
+            <button
+              type="button"
+              class="pill-btn"
+              [class.active]="categoriaActiva() === cat"
+              (click)="seleccionarCategoria(cat)"
+            >
+              {{ cat }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="productos-grid">
+      @for (producto of productosFiltrados(); track producto.id) {
+        <article class="producto-card">
+          <div class="producto-img-wrapper">
+            <img [src]="producto.image" [alt]="producto.title" loading="lazy">
+          </div>
+          <div class="producto-info">
+            <div class="brand-row">
+              <span class="brand">{{ producto.category }}</span>
+              @if (producto.duracion) {
+                <span class="presentacion-tag">{{ producto.duracion }}</span>
+              }
+            </div>
+            <h4>{{ producto.title }}</h4>
+            <p class="desc">{{ producto.description }}</p>
+            <div class="meta-row">
+              <p class="price">{{ producto.price | currency:'MXN':'symbol-narrow':'1.2-2' }} MXN</p>
+              @if (producto.rating) {
+                <span class="rating">★ {{ producto.rating.rate }} ({{ producto.rating.count }})</span>
+              }
+            </div>
+            <button type="button" class="btn-dark" (click)="solicitarEnContacto(producto)">
+              Solicitar producto
+            </button>
+          </div>
+        </article>
+      } @empty {
+        <div class="state-box">
+          <p>No se encontraron productos con ese filtro.</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>

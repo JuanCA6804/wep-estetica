@@ -1,0 +1,137 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--accent-color) 0%, #fff 100%);
+  padding: 1.5rem;
+}
+
+.login-box {
+  background-color: #fff;
+  padding: 2.5rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border-top: 4px solid var(--primary-color);
+
+  .logo {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    .logo-img {
+      max-height: 75px;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.45rem;
+      font-weight: 600;
+      font-size: 0.92rem;
+    }
+  }
+
+  button[type='submit'] {
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 12px;
+    font-size: 1.05rem;
+  }
+
+  .demo-box {
+    margin-top: 1.25rem;
+    padding: 0.9rem;
+    background: var(--accent-color);
+    border-radius: 8px;
+    text-align: center;
+
+    p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .demo-buttons {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-demo {
+      background: #fff;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: var(--primary-color);
+        color: #fff;
+      }
+    }
+  }
+
+  .auth-switch {
+    display: flex;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-top: 1.25rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+
+    a {
+      color: var(--primary-color);
+      font-weight: 700;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .back-link {
+    text-align: center;
+    margin-top: 1.25rem;
+
+    a {
+      color: #888;
+      font-size: 0.9rem;
+      transition: color 0.3s;
+
+      &:hover {
+        color: var(--primary-color);
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 1rem;
+  }
+
+  .login-box {
+    padding: 1.75rem 1.25rem;
+  }
+}

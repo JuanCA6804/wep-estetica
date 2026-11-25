@@ -1,0 +1,143 @@
+<div class="usuario-wrapper">
+  <header class="usuario-header">
+    <div class="brand">
+      <img src="assets/logo.png" alt="Logo Estética Kenya" class="logo-img">
+      <div>
+        <h2>Mi Cuenta — Estética Kenya</h2>
+        <p>Área protegida para clientes registrados</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/productos" class="btn-outline-secondary">Ver Productos</a>
+      <a routerLink="/inicio" class="btn-outline-secondary">Ir al Sitio Público</a>
+      <button type="button" class="btn-logout" (click)="cerrarSesion()">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <div class="usuario-grid">
+    <section class="card perfil-card">
+      <h3>Perfil de Usuario</h3>
+      @if (auth.user(); as user) {
+        <div class="perfil-datos">
+          <div class="dato-row">
+            <span>Usuario</span>
+            <strong>{{ user.nombre_usuario }}</strong>
+          </div>
+          <div class="dato-row">
+            <span>Correo</span>
+            <strong>{{ user.correo }}</strong>
+          </div>
+          <div class="dato-row">
+            <span>Rol asignado</span>
+            <span class="role-badge">{{ user.rol }}</span>
+          </div>
+          <div class="dato-row">
+            <span>Sesión con Token</span>
+            <strong>{{ auth.token() ? 'Activa (JWT / Sesión)' : 'Inactiva' }}</strong>
+          </div>
+          <div class="dato-row">
+            <span>Última actualización</span>
+            <strong>{{ user.fechaModificacion }}</strong>
+          </div>
+        </div>
+        <p class="role-note">
+          Tu cuenta tiene rol estándar (<strong>{{ user.rol }}</strong>). El Panel Administrativo está restringido únicamente a administradores.
+        </p>
+      }
+    </section>
+
+    <section class="card">
+      <h3>Agendar Nueva Cita</h3>
+      @if (feedback()) {
+        <div class="feedback-banner success" role="status">{{ feedback() }}</div>
+      }
+      <form [formGroup]="citaForm" (ngSubmit)="solicitarCita()" class="cita-form">
+        <div class="form-group">
+          <label for="u_servicio">Servicio o Paquete</label>
+          <select id="u_servicio" formControlName="servicio">
+            @for (srv of serviciosDisponibles(); track srv) {
+              <option [value]="srv">{{ srv }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="u_telefono">Teléfono (10 dígitos)</label>
+          <input
+            id="u_telefono"
+            type="tel"
+            maxlength="10"
+            formControlName="telefono"
+            placeholder="Ej. 2711234567"
+            [class.is-invalid]="citaForm.controls.telefono.invalid && citaForm.controls.telefono.touched"
+          >
+          @if (citaForm.controls.telefono.invalid && citaForm.controls.telefono.touched) {
+            <span class="error-message">Ingresa un teléfono válido de 10 dígitos.</span>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="u_fecha">Fecha</label>
+            <input
+              id="u_fecha"
+              type="date"
+              formControlName="fecha"
+              [class.is-invalid]="citaForm.controls.fecha.invalid && citaForm.controls.fecha.touched"
+            >
+            @if (citaForm.controls.fecha.invalid && citaForm.controls.fecha.touched) {
+              <span class="error-message">La fecha es obligatoria.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="u_hora">Hora</label>
+            <input
+              id="u_hora"
+              type="time"
+              formControlName="hora"
+              [class.is-invalid]="citaForm.controls.hora.invalid && citaForm.controls.hora.touched"
+            >
+            @if (citaForm.controls.hora.invalid && citaForm.controls.hora.touched) {
+              <span class="error-message">La hora es obligatoria.</span>
+            }
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary">Solicitar Cita</button>
+      </form>
+    </section>
+  </div>
+
+  <section class="card citas-section">
+    <h3>Mis Citas Registradas</h3>
+    @if (misCitas().length === 0) {
+      <p class="empty-msg">Aún no tienes citas registradas en esta cuenta.</p>
+    } @else {
+      <div class="table-scroll">
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>Folio</th>
+              <th>Servicio</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (cita of misCitas(); track cita.id_cita) {
+              <tr>
+                <td>#{{ cita.id_cita }}</td>
+                <td>{{ cita.servicio || 'Servicio general' }}</td>
+                <td>{{ cita.fecha | date:'dd/MM/yyyy' }}</td>
+                <td>{{ cita.hora }}</td>
+                <td><span class="status-pill">{{ cita.estado }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</div>

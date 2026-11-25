@@ -1,0 +1,101 @@
+<div class="login-container">
+  <div class="login-box">
+    <div class="logo">
+      <img src="assets/logo.png" alt="Logo Estética Kenya" class="logo-img">
+      <p>Crear Cuenta de Cliente</p>
+    </div>
+
+    @if (error()) {
+      <div class="feedback-banner error" role="alert">{{ error() }}</div>
+    }
+
+    <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="reg_usuario">Nombre de Usuario</label>
+        <input
+          type="text"
+          id="reg_usuario"
+          formControlName="nombre_usuario"
+          placeholder="Ej. ana_lopez"
+          [class.is-invalid]="registroForm.controls.nombre_usuario.invalid && registroForm.controls.nombre_usuario.touched"
+        >
+        @if (registroForm.controls.nombre_usuario.invalid && registroForm.controls.nombre_usuario.touched) {
+          @if (registroForm.controls.nombre_usuario.hasError('required')) {
+            <span class="error-message">El usuario es obligatorio.</span>
+          }
+          @if (registroForm.controls.nombre_usuario.hasError('minlength')) {
+            <span class="error-message">Mínimo 3 caracteres.</span>
+          }
+          @if (registroForm.controls.nombre_usuario.hasError('pattern')) {
+            <span class="error-message">Solo letras, números, puntos o guiones sin espacios.</span>
+          }
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="reg_correo">Correo Electrónico (único)</label>
+        <input
+          type="email"
+          id="reg_correo"
+          formControlName="correo"
+          placeholder="correo&#64;ejemplo.com"
+          [class.is-invalid]="registroForm.controls.correo.invalid && registroForm.controls.correo.touched"
+        >
+        @if (registroForm.controls.correo.invalid && registroForm.controls.correo.touched) {
+          @if (registroForm.controls.correo.hasError('required')) {
+            <span class="error-message">El correo es obligatorio.</span>
+          }
+          @if (registroForm.controls.correo.hasError('email')) {
+            <span class="error-message">Ingresa un correo electrónico válido.</span>
+          }
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="reg_password">Contraseña</label>
+        <input
+          type="password"
+          id="reg_password"
+          formControlName="password"
+          placeholder="Mínimo 6 caracteres"
+          [class.is-invalid]="registroForm.controls.password.invalid && registroForm.controls.password.touched"
+        >
+        @if (registroForm.controls.password.invalid && registroForm.controls.password.touched) {
+          @if (registroForm.controls.password.hasError('required')) {
+            <span class="error-message">La contraseña es obligatoria.</span>
+          }
+          @if (registroForm.controls.password.hasError('minlength')) {
+            <span class="error-message">Mínimo 6 caracteres para mayor seguridad.</span>
+          }
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="reg_confirm">Confirmar Contraseña</label>
+        <input
+          type="password"
+          id="reg_confirm"
+          formControlName="confirmPassword"
+          placeholder="Repite tu contraseña"
+          [class.is-invalid]="(registroForm.controls.confirmPassword.invalid || registroForm.hasError('mismatch')) && registroForm.controls.confirmPassword.touched"
+        >
+        @if (registroForm.controls.confirmPassword.touched && registroForm.hasError('mismatch')) {
+          <span class="error-message">Las contraseñas no coinciden.</span>
+        }
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="loading()">
+        {{ loading() ? 'Registrando...' : 'Registrarme' }}
+      </button>
+
+      <div class="auth-switch">
+        <span>¿Ya tienes cuenta?</span>
+        <a routerLink="/login">Inicia sesión aquí</a>
+      </div>
+
+      <div class="back-link">
+        <a routerLink="/">&larr; Volver al Inicio</a>
+      </div>
+    </form>
+  </div>
+</div>

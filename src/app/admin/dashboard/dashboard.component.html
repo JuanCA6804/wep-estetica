@@ -1,0 +1,52 @@
+<div class="dashboard-header">
+  <h2>Resumen del Sistema</h2>
+  <p>Bienvenido al panel administrativo de Estética Kenya.</p>
+</div>
+
+<div class="stats-grid">
+  <a routerLink="/admin/citas" class="stat-card">
+    <h3>Citas Registradas</h3>
+    <p class="number">{{ adminData.citas().length }}</p>
+    <span class="sub">{{ citasPendientes() }} pendientes</span>
+  </a>
+  <a routerLink="/admin/usuarios" class="stat-card">
+    <h3>Usuarios y Roles</h3>
+    <p class="number">{{ adminData.usuarios().length }}</p>
+    <span class="sub">Control de acceso activo</span>
+  </a>
+  <a routerLink="/admin/productos" class="stat-card">
+    <h3>Catálogo (Productos, Servicios y Paquetes)</h3>
+    <p class="number">{{ productosService.catalogo().length }}</p>
+    <span class="sub">{{ productosService.soloProductos().length }} productos &middot; {{ productosService.serviciosYPaquetes().length }} servicios/paquetes</span>
+  </a>
+</div>
+
+<div class="table-container">
+  <h3>Próximas Citas Registradas</h3>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Cliente</th>
+          <th>Servicio</th>
+          <th>Estado</th>
+          <th>Bitácora</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (cita of citasRecientes(); track cita.id_cita) {
+          <tr>
+            <td>{{ cita.fecha | date:'dd/MM/yyyy' }}</td>
+            <td>{{ cita.hora }}</td>
+            <td>{{ cita.nombre_invitado || 'Cliente #' + cita.id_cliente }}</td>
+            <td>{{ cita.servicio || 'Servicio general' }}</td>
+            <td><span class="badge" [class]="cita.estado.toLowerCase()">{{ cita.estado }}</span></td>
+            <td class="audit-cell">{{ cita.modificadoPor }} &middot; {{ cita.fechaModificacion }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
